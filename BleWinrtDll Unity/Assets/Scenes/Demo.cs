@@ -12,6 +12,7 @@ public class Demo : MonoBehaviour
     public bool isScanningDevices = false;
     public bool isScanningServices = false;
     public bool isScanningCharacteristics = false;
+    [SerializeField]
     public bool isSubscribed = false;
     public Text deviceScanButtonText;
     public Text deviceScanStatusText;
@@ -37,10 +38,11 @@ public class Demo : MonoBehaviour
     string lastError;
 
     string read_characteristic;
-    string write_characteristic;
+    string write_characteristic = "{00002ad9-0000-1000-8000-00805f9b34fb}";
     float last_write_time = 0.0f;
     int sended_resistance = 0;
     public Text resistance_show;
+    public string output;
 
 
     // Start is called before the first frame update
@@ -397,11 +399,7 @@ public class Demo : MonoBehaviour
 
     public void write_resistance(float val)
     {
-        if (isSubscribed)
-        {
-            write_resistance(Mathf.FloorToInt(val));
-            resistance_show.text = "Resistance: " + Mathf.FloorToInt(val).ToString();
-        }
+        write_resistance(Mathf.FloorToInt(val));
     }
     public void write_resistance(int val)
     {
@@ -416,7 +414,7 @@ public class Demo : MonoBehaviour
 
         Debug.Log("write resistance: " + val);
 
-        BleApi.SubscribeCharacteristic_Write(selectedDeviceId, selectedServiceId, write_characteristic, false);
+        BleApi.SubscribeCharacteristic_Write(selectedDeviceId, selectedServiceId, write_characteristic = "{00002ad9-0000-1000-8000-00805f9b34fb}", false);
         Write("00");
         byte resistance1 = Convert.ToByte(val % 256);
         byte resistance2 = Convert.ToByte(val / 256);
@@ -425,7 +423,6 @@ public class Demo : MonoBehaviour
         data.buf = new byte[512];
         data.deviceId = selectedDeviceId;
         data.serviceUuid = selectedServiceId;
-        write_characteristic = "{00002ad9-0000-1000-8000-00805f9b34fb}";
         data.characteristicUuid = write_characteristic;
         for (int i = 0; i < payload.Length; i++)
         {
