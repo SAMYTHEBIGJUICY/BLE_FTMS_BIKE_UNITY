@@ -125,13 +125,14 @@ public class WGBLEDemo : MonoBehaviour
                 }
             } while (status == BleApi.ScanStatus.AVAILABLE);
         }
-       
+
 
         if (isSubscribed)
         {
             BleApi.BLEData res = new BleApi.BLEData();
             while (BleApi.PollData(out res, false))
             {
+
                 //subcribeText.text = BitConverter.ToString(res.buf, 0, res.size);
                 int index = 0;
                 //  output = "Connection Loading... \n If no data appears after a few seconds please press 'Connect to Trainer' again";
@@ -139,113 +140,118 @@ public class WGBLEDemo : MonoBehaviour
                 output = "";
                 flags = BitConverter.ToUInt16(res.buf, index);
                 index += 2;
-                // Test the first bit more data
-                if ((flags & 1) == 0) // if zero intaneous speed is displayed
-                {
-                    float value = (float)BitConverter.ToUInt16(res.buf, index);
-                    speed = (value * 1.0f) / 100.0f;
-                    output += "Speed: " + speed + "\n";
-                    index += 2;
-                }
-                else
-                {
-                    output += "Speed: " + speed + "\n";
-                }
 
-                if ((flags & 2) > 0)
+                if (res.deviceId == selectedDeviceId)
                 {
-                    //??
-                    average_speed = BitConverter.ToUInt16(res.buf, index);
-                    //output += "Average Speed: " + average_speed + "\n";
-                    index += 2;
-                }
-                else if ((flags & 2) == 0)
-                {
-                    //output += "Average Speed: " + average_speed + "\n";
-                }
 
-                if ((flags & 4) > 0)
-                {
-                    rpm = (BitConverter.ToUInt16(res.buf, index) * 1.0f) / 2.0f;
-                    output += "RPM: (rev/min): " + rpm + "\n";
-                    index += 2;
-                }
-                else
-                {
-                    output += "RPM: (rev/min): " + rpm + "\n";
-                }
+                    // Test the first bit more data
+                    if ((flags & 1) == 0) // if zero intaneous speed is displayed
+                    {
+                        float value = (float)BitConverter.ToUInt16(res.buf, index);
+                        speed = (value * 1.0f) / 100.0f;
+                        output += "Speed: " + speed + "\n";
+                        index += 2;
+                    }
+                    else
+                    {
+                        output += "Speed: " + speed + "\n";
+                    }
 
-                if ((flags & 8) > 0)
-                {
-                    average_rpm = (BitConverter.ToUInt16(res.buf, index) * 1.0f) / 2.0f;
-                    //output += "Average RPM: " + average_rpm + "\n";
-                    index += 2;
-                }
-                else
-                {
-                    //output += "Average RPM: " + average_rpm + "\n";
-                }
+                    if ((flags & 2) > 0)
+                    {
+                        //??
+                        average_speed = BitConverter.ToUInt16(res.buf, index);
+                        //output += "Average Speed: " + average_speed + "\n";
+                        index += 2;
+                    }
+                    else if ((flags & 2) == 0)
+                    {
+                        //output += "Average Speed: " + average_speed + "\n";
+                    }
 
-                if ((flags & 16) > 0)
-                {
-                    distance = BitConverter.ToUInt16(res.buf, index); // ?????s
-                    //output += "Distance (meter): " + distance + "\n";
-                    index += 2;
-                }
-                else
-                {
-                    //output += "Distance (meter): " + distance + "\n";
-                }
+                    if ((flags & 4) > 0)
+                    {
+                        rpm = (BitConverter.ToUInt16(res.buf, index) * 1.0f) / 2.0f;
+                        output += "RPM: (rev/min): " + rpm + "\n";
+                        index += 2;
+                    }
+                    else
+                    {
+                        output += "RPM: (rev/min): " + rpm + "\n";
+                    }
 
-                if ((flags & 32) > 0)
-                {
-                    resistance = BitConverter.ToInt16(res.buf, index);
-                    //output += "Resistance: " + resistance + "\n";
-                    index += 2;
-                }
-                else
-                {
-                    // output += "Resistance: " + resistance + "\n";
-                }
+                    if ((flags & 8) > 0)
+                    {
+                        average_rpm = (BitConverter.ToUInt16(res.buf, index) * 1.0f) / 2.0f;
+                        //output += "Average RPM: " + average_rpm + "\n";
+                        index += 2;
+                    }
+                    else
+                    {
+                        //output += "Average RPM: " + average_rpm + "\n";
+                    }
 
-                if ((flags & 64) > 0)
-                {
-                    power = BitConverter.ToInt16(res.buf, index);
-                    output += "Power (Watt): " + power + "\n";
-                    index += 2;
-                }
-                else
-                {
-                    output += "Power (Watt): " + power + "\n";
-                }
+                    if ((flags & 16) > 0)
+                    {
+                        distance = BitConverter.ToUInt16(res.buf, index); // ?????s
+                                                                          //output += "Distance (meter): " + distance + "\n";
+                        index += 2;
+                    }
+                    else
+                    {
+                        //output += "Distance (meter): " + distance + "\n";
+                    }
 
-                if ((flags & 128) > 0)
-                {
-                    average_power = BitConverter.ToInt16(res.buf, index);
-                    // output += "AveragePower: " + average_power + "\n";
-                    index += 2;
-                }
-                else
-                {
-                    //  output += "AveragePower: " + average_power + "\n";
-                }
+                    if ((flags & 32) > 0)
+                    {
+                        resistance = BitConverter.ToInt16(res.buf, index);
+                        //output += "Resistance: " + resistance + "\n";
+                        index += 2;
+                    }
+                    else
+                    {
+                        // output += "Resistance: " + resistance + "\n";
+                    }
 
-                if ((flags & 256) > 0)
-                {
-                    expended_energy = BitConverter.ToUInt16(res.buf, index);
-                    // output += "ExpendedEnergy: " + expended_energy + "\n";
-                    index += 2;
+                    if ((flags & 64) > 0)
+                    {
+                        power = BitConverter.ToInt16(res.buf, index);
+                        output += "Power (Watt): " + power + "\n";
+                        index += 2;
+                    }
+                    else
+                    {
+                        output += "Power (Watt): " + power + "\n";
+                    }
+
+                    if ((flags & 128) > 0)
+                    {
+                        average_power = BitConverter.ToInt16(res.buf, index);
+                        // output += "AveragePower: " + average_power + "\n";
+                        index += 2;
+                    }
+                    else
+                    {
+                        //  output += "AveragePower: " + average_power + "\n";
+                    }
+
+                    if ((flags & 256) > 0)
+                    {
+                        expended_energy = BitConverter.ToUInt16(res.buf, index);
+                        // output += "ExpendedEnergy: " + expended_energy + "\n";
+                        index += 2;
+                    }
+                    else
+                    {
+                        // output += "ExpendedEnergy: " + expended_energy + "\n";
+                    }
+
+                    output = "Connection Established\n\n" + output;
+
+                    // subcribeText.text = Encoding.ASCII.GetString(res.buf, 0, res.size);
+                    //Debug.Log("power" + power);
+
                 }
-                else
-                {
-                    // output += "ExpendedEnergy: " + expended_energy + "\n";
-                }
-
-                output = "Connection Established\n\n" + output;
-
-                // subcribeText.text = Encoding.ASCII.GetString(res.buf, 0, res.size);
-                //Debug.Log("power" + power);
-
             }
         }
         {
@@ -371,11 +377,14 @@ public class WGBLEDemo : MonoBehaviour
     public void Subscribe()
     {
         // no error code available in non-blocking mode
-        BleApi.SubscribeCharacteristic_Read(selectedDeviceId, selectedServiceId = "{00001826-0000-1000-8000-00805f9b34fb}", read_characteristic = "{00002ad2-0000-1000-8000-00805f9b34fb}", false);
+        BleApi.SubscribeCharacteristic(selectedDeviceId, selectedServiceId = "{00001826-0000-1000-8000-00805f9b34fb}", read_characteristic = "{00002ad2-0000-1000-8000-00805f9b34fb}", false);
         if (!isSubscribed)
 
         {
             isSubscribed = true;
+
+
+
         }
 
 
@@ -486,7 +495,7 @@ public class WGBLEDemo : MonoBehaviour
 
         //Debug.Log("write resistance: " + val);
 
-        BleApi.SubscribeCharacteristic_Write(selectedDeviceId, selectedServiceId, write_characteristic = "{00002ad9-0000-1000-8000-00805f9b34fb}", false);
+        BleApi.SubscribeCharacteristic(selectedDeviceId, selectedServiceId, write_characteristic = "{00002ad9-0000-1000-8000-00805f9b34fb}", false);
         Write("00");
         byte resistance1 = Convert.ToByte(val % 256);
         byte resistance2 = Convert.ToByte(val / 256);
